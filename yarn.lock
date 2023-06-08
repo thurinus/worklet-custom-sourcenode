@@ -1916,6 +1916,11 @@
   resolved "https://registry.yarnpkg.com/@types/aria-query/-/aria-query-5.0.1.tgz#3286741fb8f1e1580ac28784add4c7a1d49bdfbc"
   integrity sha512-XTIieEY+gvJ39ChLcB4If5zHtPxt3Syj5rgZR+e1ctpmK8NjPf0zFqsz4JpLJT0xla9GFDKjy8Cpu331nrmE1Q==
 
+"@types/audioworklet@^0.0.46":
+  version "0.0.46"
+  resolved "https://registry.yarnpkg.com/@types/audioworklet/-/audioworklet-0.0.46.tgz#a03c3a772f92e889bb36e4ca0ee1547abeb98e97"
+  integrity sha512-LWJ9gC7sTsV/r8Vud0+WChc18tSHtYzr0/z4IFVtDuCQ2nsDxWM5yUNsVIN64F5foipNzGTHq3GmnyLhosJ9Fw==
+
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.14":
   version "7.20.1"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.20.1.tgz#916ecea274b0c776fec721e333e55762d3a9614b"

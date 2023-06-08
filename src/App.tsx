@@ -1,24 +1,44 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useCallback } from "react";
+
+let context: AudioContext;
+function getContext() {
+  if (!context) context = new AudioContext();
+  return context;
+}
 
 function App() {
+  const onJsWorklet = useCallback(() => {
+    const context = getContext();
+    context.audioWorklet
+      .addModule(
+        new URL("./audioworklets/JavascriptWorklet.worklet", import.meta.url)
+      )
+      .then(() => {
+        console.log(`js worklet loaded`);
+      })
+      .catch((e) => {
+        console.log(`error loading JS worklet: ${e}`);
+      });
+  }, []);
+
+  const onTsWorklet = useCallback(() => {
+    const context = getContext();
+    context.audioWorklet
+      .addModule(
+        new URL("./audioworklets/TypescriptWorklet.worklet", import.meta.url)
+      )
+      .then(() => {
+        console.log(`TS worklet loaded`);
+      })
+      .catch((e) => {
+        console.log(`error loading TS worklet: ${e}`);
+      });
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <button onClick={onJsWorklet}>Run Javascript Worklet</button>
+      <button onClick={onTsWorklet}>Run Typescript Worklet</button>
     </div>
   );
 }
