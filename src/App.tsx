@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 
 let context: AudioContext;
 function getContext() {
@@ -7,6 +7,14 @@ function getContext() {
 }
 
 function App() {
+  const activeNodes = useRef(new Set<AudioNode>());
+
+  const onStop = useCallback(() => {
+    activeNodes.current.forEach(node => {
+      node.disconnect();
+    });
+  }, []);
+
   const onJsWorklet = useCallback(() => {
     const context = getContext();
     context.audioWorklet
@@ -15,6 +23,9 @@ function App() {
       )
       .then(() => {
         console.log(`js worklet loaded`);
+        const node = new AudioWorkletNode(context, 'javascript-worklet');
+        node.connect(context.destination);
+        activeNodes.current.add(node);
       })
       .catch((e) => {
         console.log(`error loading JS worklet: ${e}`);
@@ -29,6 +40,9 @@ function App() {
       )
       .then(() => {
         console.log(`TS worklet loaded`);
+        const node = new AudioWorkletNode(context, 'typescript-worklet');
+        node.connect(context.destination);
+        activeNodes.current.add(node);
       })
       .catch((e) => {
         console.log(`error loading TS worklet: ${e}`);
@@ -39,6 +53,8 @@ function App() {
     <div className="App">
       <button onClick={onJsWorklet}>Run Javascript Worklet</button>
       <button onClick={onTsWorklet}>Run Typescript Worklet</button>
+      <br />
+      <button onClick={onStop}>Stop</button>
     </div>
   );
 }

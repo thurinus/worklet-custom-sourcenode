@@ -10,6 +10,8 @@ class TypescriptWorklet extends AudioWorkletProcessor {
   }
 }
 
+console.log(globalThis);
+
 registerProcessor("typescript-worklet", TypescriptWorklet);
 
 export {};
