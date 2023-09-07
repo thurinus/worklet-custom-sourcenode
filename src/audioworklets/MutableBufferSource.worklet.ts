@@ -22,16 +22,18 @@ class MutableBufferSource extends AudioWorkletProcessor {
           );
         } else {
           const offset = this.samples[0].length;
+          let lastOffset = 0;
           // cycle channels
           console.log(`jlim about to concat samples with offset: ${offset}`);
           for (let c = 0; c < this.samples.length; c++) {
             console.log(`jlim adding to sample channel ${c}`);
             for (let s = 0; s < data[c].length; s++) {
-              this.samples[c][s + offset] = data[c][s];
+              lastOffset = s + offset;
+              this.samples[c][lastOffset] = data[c][s];
             }
           }
           console.log(
-            `jlim post added samples. now sample length is ${this.samples[0].length}`
+            `jlim post added samples. now sample length is ${this.samples[0].length}, lastoffset was: ${lastOffset}`
           );
         }
         break;

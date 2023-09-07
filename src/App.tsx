@@ -22,40 +22,6 @@ function App() {
     clearInterval(intervalHandle.current);
   }, []);
 
-  const onJsWorklet = useCallback(() => {
-    const context = getContext();
-    context.audioWorklet
-      .addModule(
-        new URL("./audioworklets/JavascriptWorklet.worklet", import.meta.url)
-      )
-      .then(() => {
-        console.log(`js worklet loaded`);
-        const node = new AudioWorkletNode(context, "javascript-worklet");
-        node.connect(context.destination);
-        activeNodes.current.add(node);
-      })
-      .catch((e) => {
-        console.log(`error loading JS worklet: ${e}`);
-      });
-  }, []);
-
-  const onTsWorklet = useCallback(() => {
-    const context = getContext();
-    context.audioWorklet
-      .addModule(
-        new URL("./audioworklets/TypescriptWorklet.worklet", import.meta.url)
-      )
-      .then(() => {
-        console.log(`TS worklet loaded`);
-        const node = new AudioWorkletNode(context, "typescript-worklet");
-        node.connect(context.destination);
-        activeNodes.current.add(node);
-      })
-      .catch((e) => {
-        console.log(`error loading TS worklet: ${e}`);
-      });
-  }, []);
-
   const onMutableBufferSourceWorklet = useCallback(async () => {
     const context = getContext();
     try {
@@ -107,13 +73,6 @@ function App() {
   return (
     <div className="App">
       <div>
-        Inactive right now:
-        <br />
-        <button onClick={onJsWorklet}>Run Javascript Worklet</button>
-        <button onClick={onTsWorklet}>Run Typescript Worklet</button>
-      </div>
-      <div>
-        Target: <br />
         <button onClick={onMutableBufferSourceWorklet}>
           Run MutableBufferSource Worklet
         </button>
