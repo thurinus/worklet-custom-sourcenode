@@ -22,6 +22,22 @@ function App() {
     clearInterval(intervalHandle.current);
   }, []);
 
+  const onRegularAudioBufferSource = useCallback(async () => {
+    const context = getContext();
+
+    const buffer = await loadAudioBuffer(
+      "https://dev-media.darkdesk.io/public/audio_test/segment_10_gray.wav",
+      context
+    );
+
+    if (buffer) {
+      const node = new AudioBufferSourceNode(context, { buffer });
+      node.start();
+      node.connect(context.destination);
+      activeNodes.current.add(node);
+    }
+  }, []);
+
   const onMutableBufferSourceWorklet = useCallback(async () => {
     const context = getContext();
     try {
@@ -36,7 +52,8 @@ function App() {
       activeNodes.current.add(node);
 
       const buffer = await loadAudioBuffer(
-        "https://dev-media.darkdesk.io/public/audio_test_2/seg0.wav",
+        //"https://dev-media.darkdesk.io/public/audio_test_2/seg0.wav",
+        "https://dev-media.darkdesk.io/public/audio_test/segment_10_gray.wav",
         context
       );
 
@@ -53,7 +70,8 @@ function App() {
       }
 
       const buffer2 = await loadAudioBuffer(
-        "https://dev-media.darkdesk.io/public/audio_test_2/seg1.wav",
+        "https://dev-media.darkdesk.io/public/audio_test/segment_11_gray.wav",
+        // "https://dev-media.darkdesk.io/public/audio_test_2/seg1.wav",
         context
       );
 
@@ -75,6 +93,11 @@ function App() {
       <div>
         <button onClick={onMutableBufferSourceWorklet}>
           Run MutableBufferSource Worklet
+        </button>
+      </div>
+      <div>
+        <button onClick={onRegularAudioBufferSource}>
+          Run regular AudioBufferSourceNode
         </button>
       </div>
 
