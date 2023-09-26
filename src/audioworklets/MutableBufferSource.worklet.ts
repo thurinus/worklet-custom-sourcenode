@@ -1,3 +1,4 @@
+import { channel } from "diagnostics_channel";
 import { MutableBufferSourceWorkletMessage } from "../WorkletTypes";
 
 class MutableBufferSource extends AudioWorkletProcessor {
@@ -10,6 +11,7 @@ class MutableBufferSource extends AudioWorkletProcessor {
    * though this is speculation since no error was thrown despite the copying not working.
    */
   private segmentSamples: Float32Array[][] = [];
+  private segmentCache: Map<string, Float32Array[]> = new Map();
 
   /**
    * Offset of each segment from the start (cumulative).
@@ -29,14 +31,10 @@ class MutableBufferSource extends AudioWorkletProcessor {
     switch (e.data.type) {
       case "ADD_SAMPLES":
         const data = e.data.channelData;
+        this.segmentCache.set(e.data.url, e.data.channelData);
         this.segmentSamples.push(data);
         this.segmentOffsets.push(
           this.segmentOffsets[this.segmentOffsets.length - 1] + data[0].length
-        );
-        console.log(
-          `jlim sample added at offset: ${
-            this.segmentOffsets[this.segmentOffsets.length - 2]
-          }.`
         );
         break;
       case "DISPOSE":
@@ -56,6 +54,29 @@ class MutableBufferSource extends AudioWorkletProcessor {
     }
     // segment not found
     return -1;
+  }
+
+  private returnMemoryToMainThread() {
+    // const toTransfer: ArrayBuffer[] = [];
+    // let data: Float32Array | null = null;
+    for (const [url, channelData] of this.segmentCache) {
+      const toTransfer = channelData.map((channel) => channel.buffer);
+      const message: MutableBufferSourceWorkletMessage = {
+        type: "RESTORE_SAMPLES",
+        url,
+        channelData,
+      };
+      this.port.postMessage(message, toTransfer);
+    }
+
+    // for (const segment of this.segmentSamples) {
+    //   for (const channel of segment) {
+    //     data = channel;
+    //     toTransfer.push(channel.buffer);
+    //   }
+    // }
+    // console.log(`jlim returning buffer memory to main thread from worklet`);
+    // this.port.postMessage({ channel: data }, toTransfer);
   }
 
   // see https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletProcessor/process for details, like:
@@ -105,8 +126,9 @@ class MutableBufferSource extends AudioWorkletProcessor {
       return false;
     }
 
+    // attempt to return memory to main thread
     if (this.disposed) {
-      console.log(`jlim disposing`);
+      this.returnMemoryToMainThread();
     }
 
     return !this.disposed;
